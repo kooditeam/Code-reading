@@ -15,5 +15,5 @@ deploy:
   api_key:
     secure: Hp3Fxxj9bGV44azmTUXiVe6CRTz1QJNChtkTuQ1thqA8CBbwwNTmWeW3cySjMBRymHqiwuVF6wm77FfeUa/rtHEox6Nk2ds9tIYiqLm2XBhQAuek6qsyKYRfXpKcyPvFgSV+nW3tOY4ysXo3aufaUaYilVjA9LmTiPsbgVHVfqSB/1ncSCCUGCXdybUE4UtCgmNc1e2PXkRUP4eNesB4KWMvhKU7juSyK72dp49sF/3LdD8xjtMZTFJyS+QrV+CJ/F/q4/5326H4WORgLluRLow9VnDrDZlZ38f7uECMAU9TG3UQTyYB9cFIQPNO5ajEoSl/Uhv8pDGuum32kA8G16RYAq3RMD0wqhcu0kdwYEFhinw4UREY3/aB4lqY9fVtW55mQYSEBJJ3hji6JR8jhUYzrag0CfiHi6kyZXuJGKjBrBzFzlZkolQMSmrOp5D7ys/0Y3JfxVEJGs3jgnk9X2MZHzNy1b/3XqssK9XgMl1iGjQ655Y7SY6EimMapHEs/lVWrvVk5wiX8sLAcIt7Vgt3AVXCBMatFi8mCHQW254V+4bw3ar3en74xhqr1JLQGlLw+LV6AKYUKM/eEM/PVElGdRE6+/UppLggZnak+iP4PUoTVy20oeMCplnj5IDhTtMAiQg2bhFdLaj2gvh6NhF1bstbv4aAGkmhqPyrG0k=
   app: code-reading
-    on:
-      repo: kooditeam/Code-reading
+  on:
+    repo: kooditeam/Code-reading

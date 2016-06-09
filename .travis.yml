@@ -1,0 +1,20 @@
+language: java
+
+script:
+  - mvn test
+  - mvn install -DskipTests=true
+
+jdk:
+  - oraclejdk8
+
+notifications:
+  email: false
+
+deploy:
+  provider: heroku
+  api_key:
+    secure: PlOCvhYi4FMXCxVZbUnflwWKeWpHVINI/Xxqn4RK7MiXqmXXVafN3IdDRvnv9vQ06fQWLbtL5QOYZzohDkc7rN/m5tLQotXrTRxNNHQVvo7u7DQDa4L3bnbI04UY/LoygDe+ZHNPkyvSLbLfrjZvIJgLzBOFBKN0cIxy9Z6sOIJVa85R02A5392AmvpY2a7mdXnXrC/TN4pkNTcC0FOcd/5iR2/4WHJ9muGU9VKxOXj6Xlu+dtZ6iM7o8NWLpAODO9fx4nFz9zodybwTW8R4kWLtn/PElZ42E5s8FOy1pfY0Ib/Eabfiww1HXFQBqefEO9LhHiOILY8vJ50Re1IVbzUrkkBCRJ8IJnYlMAapKCMKNf50EbCuk/50cNiL8W84tf7U5AsMv3Zm6y0KjZIA0h0dzPw1qRmedh/ido6tIns5blyU9UHOqXdhQ+jplDOsbKENxQJUo9q7H4aakx4yHCuvDKEfKjYwnvOhiGAonxh7EaxqAz5X6TMZp2y2HuqVsPmLA5Zx5r5nhobbEeY+z1VB70eIe16bIUqiMC+xKCGjdsfNRMBGLbSbDcPDFQtzLY89M6qqpY2oHKC+qMwtHNKcjPfiJGVhERJSXT0alFR9o29Owm55RoVq3Z7mfhuYf2QWCevaDhyU3GywJFvSNQGc3Sk1AzFXWP5nnfauSSU=
+  app: code-reading
+  on:
+    repo: kooditeam/Code-reading
+

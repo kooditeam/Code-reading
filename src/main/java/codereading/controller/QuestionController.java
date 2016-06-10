@@ -29,7 +29,7 @@ public class QuestionController {
     }
 
     @RequestMapping(value= "/new", method = RequestMethod.POST)
-    public Question test(@RequestBody Question question) {
+    public Question createQuestion(@RequestBody Question question) {
         return questionRepository.save(question);
     }
     

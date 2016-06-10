@@ -4,6 +4,7 @@ package codereading.domain;
 import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.OneToMany;
 import org.springframework.data.jpa.domain.AbstractPersistable;
 
 /**
@@ -24,6 +25,7 @@ public class Question extends AbstractPersistable<Long> {
     @Column(columnDefinition="varchar(10000)")
     private String code;
     
+    @OneToMany
     private List<AnswerOption> answerOptions;
     
     public void setRemoved(boolean removed) {

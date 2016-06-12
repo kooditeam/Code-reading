@@ -34,7 +34,7 @@ public class AnswerOption extends AbstractPersistable<Long> {
         return answerText;
     }
 
-    public boolean isIsCorrect() {
+    public boolean getIsCorrect() {
         return isCorrect;
     }
 

@@ -17,17 +17,11 @@ public class AnswerOption extends AbstractPersistable<Long> {
     @OneToMany
     private List<Answer> answers;
 
-    private Question question;
-
     private String answerText;
     private boolean isCorrect;
 
     public List<Answer> getAnswers() {
         return answers;
-    }
-
-    public Question getQuestion() {
-        return question;
     }
 
     public String getAnswerText() {
@@ -40,10 +34,6 @@ public class AnswerOption extends AbstractPersistable<Long> {
 
     public void setAnswers(List<Answer> answers) {
         this.answers = answers;
-    }
-
-    public void setQuestion(Question question) {
-        this.question = question;
     }
 
     public void setAnswerText(String answerText) {

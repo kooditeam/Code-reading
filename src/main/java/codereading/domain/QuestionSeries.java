@@ -3,6 +3,7 @@ package codereading.domain;
 
 import java.util.ArrayList;
 import java.util.List;
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.OneToMany;
 import org.springframework.data.jpa.domain.AbstractPersistable;
@@ -13,7 +14,7 @@ import org.springframework.data.jpa.domain.AbstractPersistable;
 @Entity
 public class QuestionSeries extends AbstractPersistable<Long> {
     
-    @OneToMany
+    @OneToMany(cascade = CascadeType.ALL)
     private List<Question> questions;
     
     private String title;

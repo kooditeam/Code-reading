@@ -11,9 +11,20 @@ import org.springframework.data.jpa.domain.AbstractPersistable;
  */
 @Entity
 public class Answer extends AbstractPersistable<Long> {
-    
+
     @ManyToOne
     private AnswerOption answerOption;
+
+    @ManyToOne
+    private User answerer;
+
+    public User getAnswerer() {
+        return answerer;
+    }
+
+    public void setAnswerer(User answerer) {
+        this.answerer = answerer;
+    }
 
     public AnswerOption getAnswerOption() {
         return answerOption;
@@ -22,6 +33,4 @@ public class Answer extends AbstractPersistable<Long> {
     public void setAnswerOption(AnswerOption answerOption) {
         this.answerOption = answerOption;
     }
- 
-    
 }

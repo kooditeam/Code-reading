@@ -20,7 +20,7 @@ public class ProductionProfile {
             String username = "username";
             String password = "password";
             String url = "jdbc:postgresql://localhost/dbname";
-            String dbProperty = System.getProperty("database.url");
+            String dbProperty = System.getProperty("DATABASE_URL");
             if (dbProperty != null) {
                 dbUri = new URI(dbProperty);
 

@@ -2,30 +2,43 @@ package codereading.profile;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import javax.sql.DataSource;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
 
 @Configuration
 @Profile("production")
 public class ProductionProfile {
 
-    @Primary
     @Bean
-    public BasicDataSource dataSource() throws URISyntaxException {
-        URI dbUri = new URI(System.getenv("DATABASE_URL"));
+    public DataSource dataSource() {
 
-        String username = dbUri.getUserInfo().split(":")[0];
-        String password = dbUri.getUserInfo().split(":")[1];
-        String dbUrl = "jdbc:postgresql://" + dbUri.getHost() + ':' + dbUri.getPort() + dbUri.getPath();
+        URI dbUri;
+        try {
+            String username = "username";
+            String password = "password";
+            String url = "jdbc:postgresql://localhost/dbname";
+            String dbProperty = System.getProperty("database.url");
+            if (dbProperty != null) {
+                dbUri = new URI(dbProperty);
 
-        BasicDataSource basicDataSource = new BasicDataSource();
-        basicDataSource.setUrl(dbUrl);
-        basicDataSource.setUsername(username);
-        basicDataSource.setPassword(password);
+                username = dbUri.getUserInfo().split(":")[0];
+                password = dbUri.getUserInfo().split(":")[1];
+                url = "jdbc:postgresql://" + dbUri.getHost() + ':' + dbUri.getPort() + dbUri.getPath();
+            }
 
-        return basicDataSource;
+            BasicDataSource basicDataSource = new BasicDataSource();
+            basicDataSource.setUrl(url);
+            basicDataSource.setUsername(username);
+            basicDataSource.setPassword(password);
+            return basicDataSource;
+
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
+
+        return null;
     }
 }

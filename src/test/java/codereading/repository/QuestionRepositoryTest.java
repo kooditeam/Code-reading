@@ -142,6 +142,7 @@ public class QuestionRepositoryTest {
         assertTrue(questionRepository.questionsNotAnsweredCorrectly(user.getId()).size() == 6);
     }
 
+    @Test
     public void answeredQuestionsByAnotherUserAreNotCountedAsAnsweredQuestionsForSelf() {
         User user1 = saveUser();
         User user2 = saveUser();

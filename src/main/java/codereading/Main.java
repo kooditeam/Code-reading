@@ -9,7 +9,6 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Import;
 
-//@Import({DevProfile.class, ProdProfile.class})
 @Import({ProductionProfile.class, DevProfile.class, TestProfile.class})
 @SpringBootApplication
 public class Main {

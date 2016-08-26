@@ -17,7 +17,6 @@ import org.springframework.data.jpa.domain.AbstractPersistable;
  * (for the user to know what it's about), title and a piece of code for users
  * to try to understand. Each question can have multiple answer options and
  * belongs to a single question series.
- * Questions can be marked as removed instead of permanently deleting them.
  * When serializing a question to JSON, its questionSeries field is serialized
  * only as its id.
  */
@@ -25,7 +24,6 @@ import org.springframework.data.jpa.domain.AbstractPersistable;
 public class Question extends AbstractPersistable<Long> {
 
     private String title;
-    boolean removed;
 
     @Column(columnDefinition="varchar(10000)")
     private String info;
@@ -55,14 +53,6 @@ public class Question extends AbstractPersistable<Long> {
 
     public void setAnswerOptions(List<AnswerOption> answerOptions) {
         this.answerOptions = answerOptions;
-    }
-
-    public void setRemoved(boolean removed) {
-        this.removed = removed;
-    }
-
-    public boolean isRemoved() {
-        return removed;
     }
 
     public String getTitle() {

@@ -69,22 +69,6 @@ public class QuestionControllerTest {
     }
     
     @Test
-    public void postRequestToCreateNewQuestionSavesItToTheDatabase() throws Exception {     
-        Question question = new Question();
-        question.setTitle("testTitle1");
-        question.setCode("testCode1");
-        question.setInfo("testInfo1");
-        
-        String questionJson = json(question);
-        this.mockMvc.perform(post(API_URI + "/new")
-                .contentType(contentType)
-                .content(questionJson))
-                .andExpect(status().isOk());
-        
-        assertTrue(questionRepository.count() == 1);
-    }
-    
-    @Test
     public void putRequestToUpdateQuestionActuallyUpdatesIt() throws Exception {
         Question question = saveNewQuestion();
         Long id = question.getId();

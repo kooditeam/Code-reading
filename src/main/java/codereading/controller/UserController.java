@@ -22,12 +22,10 @@ public class UserController {
     @Autowired
     private QuestionRepository questionRepository;
 
-    /**
-     * Returns all questions that are not answered or have been answered
+    /*
+     * Returns all questions that are not answered or that have been answered
      * incorrectly by a given user. If the user does not exist, then all
      * questions are returned.
-     * @param studentNumber
-     * @return questions not answered correctly.
      */
     @RequestMapping(value = "/{studentNumber}/unanswered", method = RequestMethod.GET)
     public List<Question> getQuestions(@PathVariable String studentNumber) {

@@ -55,7 +55,7 @@ public class QuestionTest {
     @Test
     public void whenSerializingQuestionItsQuestionSeriesIsSerializedOnlyAsId() throws IOException {
         QuestionSeries series = saveQuestionSeries();
-        Question question = saveQuestionAlongWithSeries(series);
+        Question question = saveQuestionAlongWithSeriesAndUser(series, new User());
 
         assertTrue(json(question).contains("\"questionSeries\":" + series.getId()));
     }
@@ -64,8 +64,8 @@ public class QuestionTest {
     public void whenSerializingQuestionSeriesItsQuestionsSerializeTheQuestionSeriesFieldOnlyAsId() throws IOException {
         QuestionSeries series = saveQuestionSeries();
 
-        Question question1 = saveQuestionAlongWithSeries(series);
-        Question question2 = saveQuestionAlongWithSeries(series);
+        Question question1 = saveQuestionAlongWithSeriesAndUser(series, new User());
+        Question question2 = saveQuestionAlongWithSeriesAndUser(series, new User());
 
         List<Question> questions = new ArrayList<>();
         questions.add(question1);
@@ -77,14 +77,33 @@ public class QuestionTest {
         assertTrue(json(series).contains("\"questionSeries\":" + series.getId()));
     }
 
+    @Test
+    public void whenSerializingQuestionSeriesItsQuestionsSerializeTheCreatorFieldOnlyAsId() throws IOException {
+        QuestionSeries series = saveQuestionSeries();
+
+        User user = new User();
+        Question question1 = saveQuestionAlongWithSeriesAndUser(series, user);
+        Question question2 = saveQuestionAlongWithSeriesAndUser(series, user);
+
+        List<Question> questions = new ArrayList<>();
+        questions.add(question1);
+        questions.add(question2);
+
+        series.setQuestions(questions);
+        series = questionSeriesRepository.save(series);
+
+        assertTrue(json(series).contains("\"creator\":" + user.getId()));
+    }
+
     private QuestionSeries saveQuestionSeries() {
         QuestionSeries series = new QuestionSeries();
         return questionSeriesRepository.save(series);
     }
 
-    private Question saveQuestionAlongWithSeries(QuestionSeries series) {
+    private Question saveQuestionAlongWithSeriesAndUser(QuestionSeries series, User user) {
         Question question = new Question();
         question.setQuestionSeries(series);
+        question.setCreator(user);
         return questionRepository.save(question);
     }
 

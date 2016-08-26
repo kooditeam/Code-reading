@@ -17,13 +17,18 @@ import org.springframework.data.jpa.domain.AbstractPersistable;
  * (for the user to know what it's about), title and a piece of code for users
  * to try to understand. Each question can have multiple answer options and
  * belongs to a single question series.
- * When serializing a question to JSON, its questionSeries field is serialized
- * only as its id.
+ * When serializing a question to JSON, its questionSeries and creator fields are
+ * serialized only as their id.
  */
 @Entity
 public class Question extends AbstractPersistable<Long> {
 
     private String title;
+
+    @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="id")
+    @JsonIdentityReference(alwaysAsId=true)
+    @ManyToOne(cascade = CascadeType.PERSIST)
+    private User creator;
 
     @Column(columnDefinition="varchar(10000)")
     private String info;
@@ -38,6 +43,14 @@ public class Question extends AbstractPersistable<Long> {
     @JsonIdentityReference(alwaysAsId=true)
     @ManyToOne
     private QuestionSeries questionSeries;
+
+    public User getCreator() {
+        return creator;
+    }
+
+    public void setCreator(User creator) {
+        this.creator = creator;
+    }
 
     public QuestionSeries getQuestionSeries() {
         return questionSeries;

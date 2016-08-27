@@ -18,10 +18,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.springframework.data.jpa.domain.AbstractPersistable;
 
 /**
- * Questions are single exercises, which each contain info on the question
- * (for the user to know what it's about), title and a piece of code for users
- * to try to understand. Each question can have multiple answer options and
- * belongs to a single question series.
+ * Questions are single exercises.
  * When serializing a question to JSON, its questionSeries and creator fields are
  * serialized only as their id.
  */
@@ -45,7 +42,7 @@ public class Question extends AbstractPersistable<Long> {
 
     @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="id")
     @JsonIdentityReference(alwaysAsId=true)
-    @ManyToOne
+    @ManyToOne(cascade = {CascadeType.PERSIST})
     private QuestionSeries questionSeries;
 
     @JsonSerialize(using = UserSerializer.class)

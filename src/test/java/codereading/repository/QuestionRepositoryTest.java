@@ -5,6 +5,7 @@ import codereading.Main;
 import codereading.domain.Answer;
 import codereading.domain.AnswerOption;
 import codereading.domain.Question;
+import codereading.domain.QuestionSeries;
 import codereading.domain.User;
 
 import java.util.ArrayList;
@@ -38,6 +39,9 @@ public class QuestionRepositoryTest {
     @Autowired
     private AnswerOptionRepository answerOptionRepository;
 
+    @Autowired
+    private QuestionSeriesRepository questionSeriesRepository;
+
     @Test
     public void whenNoQuestionsInTheDatabaseThereAreNoUnansweredQuestionsForAUser() {
         User user = saveUser(1);
@@ -49,7 +53,7 @@ public class QuestionRepositoryTest {
     @Test
     public void withOneQuestionInTheDatabaseAndUserNotHavingAnsweredAnyReturnsThatOneQuestion() {
         User user = saveUser(2);
-        Question question = saveQuestion(10);
+        Question question = saveQuestion(10, new QuestionSeries());
 
         assertTrue(questionRepository.questionsNotAnsweredCorrectly(user.getId()).size() == 1);
     }
@@ -57,7 +61,7 @@ public class QuestionRepositoryTest {
     @Test
     public void withOneQuestionInTheDatabaseAndUserHavingAnsweredThatWrongReturnsThatOneAnswer() {
         User user = saveUser(3);
-        Question question = saveQuestion(11);
+        Question question = saveQuestion(11, new QuestionSeries());
         saveAnswer(question, user, false);
 
         assertTrue(questionRepository.questionsNotAnsweredCorrectly(user.getId()).size() == 1);
@@ -66,7 +70,7 @@ public class QuestionRepositoryTest {
     @Test
     public void withOneQuestionInTheDatabaseAndUserHavingAnsweredThatCorrectlyReturnsEmptyList() {
         User user = saveUser(4);
-        Question question = saveQuestion(12);
+        Question question = saveQuestion(12, new QuestionSeries());
         saveAnswer(question, user, true);
 
         assertTrue(questionRepository.questionsNotAnsweredCorrectly(user.getId()).isEmpty());
@@ -75,7 +79,7 @@ public class QuestionRepositoryTest {
     @Test
     public void withMultipleQuestionsInTheDatabaseAllOfThemAreUnansweredForUserAtStart() {
         User user = saveUser(5);
-        saveMultipleQuestions(5);
+        saveMultipleQuestions(5, new QuestionSeries());
 
         assertTrue(questionRepository.count() == 5);
         assertTrue(questionRepository.questionsNotAnsweredCorrectly(user.getId()).size() == 5);
@@ -84,7 +88,7 @@ public class QuestionRepositoryTest {
     @Test
     public void withMultipleQuestionsInTheDatabaseAndUserHavingAnsweredOnlyOneAndThatWasCorrectReturnsOnlyThatOneAnsweredQuestion() {
         User user = saveUser(6);
-        Question question = saveMultipleQuestions(3).get(0);
+        Question question = saveMultipleQuestions(3, new QuestionSeries()).get(0);
 
         Answer answer = saveAnswer(question, user, true);
         answerRepository.save(answer);
@@ -96,7 +100,7 @@ public class QuestionRepositoryTest {
     @Test
     public void withMultipleQuestionsInDatabaseAndUserHavingAnsweredOnlyOneThatWasWrongReturnsEmptyList() {
         User user = saveUser(7);
-        Question question = saveMultipleQuestions(3).get(0);
+        Question question = saveMultipleQuestions(3, new QuestionSeries()).get(0);
 
         Answer answer = saveAnswer(question, user, false);
         answerRepository.save(answer);
@@ -108,7 +112,7 @@ public class QuestionRepositoryTest {
     @Test
     public void withAllQuestionsAnsweredByAUserCorrectlyTheUserDoesNotHaveAnyUnansweredQuestions() {
         User user = saveUser(8);
-        answerQuestionsCorrectly(saveMultipleQuestions(4), user);
+        answerQuestionsCorrectly(saveMultipleQuestions(4, new QuestionSeries()), user);
 
         assertTrue(questionRepository.count() == 4);
         assertTrue(questionRepository.questionsNotAnsweredCorrectly(user.getId()).isEmpty());
@@ -117,7 +121,7 @@ public class QuestionRepositoryTest {
     @Test
     public void withAllQuestionsAnsweredByAUserWrongTheUserHasAllQuestionsStillUnansweredProperly() {
         User user = saveUser(9);
-        answerQuestionsWrong(saveMultipleQuestions(4), user);
+        answerQuestionsWrong(saveMultipleQuestions(4, new QuestionSeries()), user);
         
         assertTrue(questionRepository.count() == 4);
         assertTrue(questionRepository.questionsNotAnsweredCorrectly(user.getId()).size() == 4);
@@ -126,8 +130,9 @@ public class QuestionRepositoryTest {
     @Test
     public void someOfTheQuestionsAnsweredCorrectlyAndSomeWrongReturnsAllTheWronglyAnsweredQuestions() {
         User user = saveUser(10);
-        answerQuestionsWrong(saveMultipleQuestions(3), user);
-        answerQuestionsCorrectly(saveMultipleQuestions(2), user);
+        QuestionSeries series = new QuestionSeries();
+        answerQuestionsWrong(saveMultipleQuestions(3, series), user);
+        answerQuestionsCorrectly(saveMultipleQuestions(2, series), user);
         
         assertTrue(questionRepository.count() == 5);
         assertTrue(questionRepository.questionsNotAnsweredCorrectly(user.getId()).size() == 3);
@@ -136,9 +141,10 @@ public class QuestionRepositoryTest {
     @Test
     public void someOfTheQuestionsAnsweredCorrectlyAndSomeWrongAndSomeNotAtAllReturnsAllWronglyAndUnansweredQuestions() {
         User user = saveUser(11);
-        answerQuestionsWrong(saveMultipleQuestions(3), user);
-        answerQuestionsCorrectly(saveMultipleQuestions(2), user);
-        saveMultipleQuestions(3);
+        QuestionSeries series = new QuestionSeries();
+        answerQuestionsWrong(saveMultipleQuestions(3, series), user);
+        answerQuestionsCorrectly(saveMultipleQuestions(2, series), user);
+        saveMultipleQuestions(3, series);
 
         assertTrue(questionRepository.count() == 8);
         assertTrue(questionRepository.questionsNotAnsweredCorrectly(user.getId()).size() == 6);
@@ -149,11 +155,26 @@ public class QuestionRepositoryTest {
         User user1 = saveUser(12);
         User user2 = saveUser(13);
 
-        answerQuestionsCorrectly(saveMultipleQuestions(2), user1);
+        answerQuestionsCorrectly(saveMultipleQuestions(2, new QuestionSeries()), user1);
 
         assertTrue(questionRepository.count() == 2);
         assertTrue(questionRepository.questionsNotAnsweredCorrectly(user1.getId()).isEmpty());
         assertTrue(questionRepository.questionsNotAnsweredCorrectly(user2.getId()).size() == 2);
+    }
+
+    @Test
+    public void whenTryingToFetchUnansweredQuestionsFromAQuestionSeriesItReturnsAllTheUnansweredQuestionsInThatSeries() {
+        User user = saveUser(14);
+
+        QuestionSeries series = questionSeriesRepository.save(new QuestionSeries());
+        answerQuestionsWrong(saveMultipleQuestions(3, series), user);
+        answerQuestionsCorrectly(saveMultipleQuestions(2, series), user);
+        saveMultipleQuestions(2, series);
+
+        assertTrue(questionRepository.count() == 7);
+        List<Question> questions = questionRepository.questionsNotAnsweredCorrectlyInSeries(user.getId(), series.getId());
+
+        assertTrue(questions.size() == 5);
     }
 
     private void answerQuestionsWrong(List<Question> questions, User user) {
@@ -170,17 +191,19 @@ public class QuestionRepositoryTest {
         }
     }
 
-    private List<Question> saveMultipleQuestions(int amount) {
+    private List<Question> saveMultipleQuestions(int amount, QuestionSeries series) {
         List<Question> questions = new ArrayList<>();
         for (int i = 1; i <= amount; i++) {
-            questions.add(saveQuestion(i));
+            questions.add(saveQuestion(i, series));
         }
         return questions;
     }
 
-    private Question saveQuestion(int i) {
+    private Question saveQuestion(int i, QuestionSeries series) {
         Question question = new Question();
         question.setCreator(new User("sjjsjss" + i));
+        question.setQuestionSeries(series);
+
         return questionRepository.save(question);
     }
 

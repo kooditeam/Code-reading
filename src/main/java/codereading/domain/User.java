@@ -4,6 +4,9 @@ package codereading.domain;
 import java.util.List;
 import javax.persistence.Entity;
 import javax.persistence.OneToMany;
+import javax.validation.constraints.NotNull;
+
+import org.hibernate.validator.constraints.NotBlank;
 import org.springframework.data.jpa.domain.AbstractPersistable;
 
 /**
@@ -13,6 +16,8 @@ import org.springframework.data.jpa.domain.AbstractPersistable;
 @Entity
 public class User extends AbstractPersistable<Long> {
 
+    @NotNull
+    @NotBlank
     private String studentNumber;
 
     @OneToMany
@@ -20,6 +25,12 @@ public class User extends AbstractPersistable<Long> {
 
     @OneToMany
     private List<Question> createdQuestions;
+
+    public User() {}
+
+    public User(String studentNumber) {
+        this.studentNumber = studentNumber;
+    }
 
     public List<Question> getCreatedQuestions() {
         return createdQuestions;

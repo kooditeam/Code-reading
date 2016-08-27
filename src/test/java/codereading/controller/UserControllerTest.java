@@ -79,10 +79,11 @@ public class UserControllerTest {
         assertTrue(questions.length == questionRepository.count());      
     }
 
+
     @Test
-    public void tryingToQuestionsForAnExistingUserReturnsAllQuestionsWhenUserHasNotAnsweredAny() throws Exception {
+    public void tryingToGetQuestionsForAnExistingUserReturnsAllQuestionsWhenUserHasNotAnsweredAny() throws Exception {
         saveMultipleQuestions(5);
-        saveUser(null);
+        saveUser("012234555");
 
         MvcResult result = this.mockMvc.perform(get(API_URI + "/099999999/unanswered"))
                 .andExpect(status().isOk())
@@ -163,13 +164,14 @@ public class UserControllerTest {
     private List<Question> saveMultipleQuestions(int amount) {
         List<Question> questions = new ArrayList<>();
         for (int i = 1; i <= amount; i++) {
-            questions.add(saveQuestion());
+            questions.add(saveQuestion(i));
         }
         return questions;
     }
 
-    private Question saveQuestion() {
+    private Question saveQuestion(int i) {
         Question question = new Question();
+        question.setCreator(saveUser("0324612" + i));
         return questionRepository.save(question);
     }
 
@@ -191,9 +193,6 @@ public class UserControllerTest {
     }
 
     private User saveUser(String studentNumber) {
-        User user = new User();
-        user.setStudentNumber(studentNumber);
-        
-        return userRepository.save(user);
+        return userRepository.save(new User(studentNumber));
     }
 }

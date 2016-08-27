@@ -3,6 +3,7 @@ package codereading.controller;
 
 import codereading.Main;
 import codereading.domain.Question;
+import codereading.domain.User;
 import codereading.repository.QuestionRepository;
 import java.io.IOException;
 
@@ -70,7 +71,7 @@ public class QuestionControllerTest {
     
     @Test
     public void putRequestToUpdateQuestionActuallyUpdatesIt() throws Exception {
-        Question question = saveNewQuestion();
+        Question question = saveNewQuestion(0);
         Long id = question.getId();
         
         Question updated = new Question();
@@ -92,11 +93,12 @@ public class QuestionControllerTest {
         assertEquals("updatedInfo", updatedHopefully.getInfo());
     }
     
-    private Question saveNewQuestion() {
+    private Question saveNewQuestion(int i) {
         Question question = new Question();
         question.setTitle("testTitle2");
         question.setCode("testCode2");
         question.setInfo("testInfo2");
+        question.setCreator(new User("743432423" + i));
         
         return questionRepository.save(question);
     }

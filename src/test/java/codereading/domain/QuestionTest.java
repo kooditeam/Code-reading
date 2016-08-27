@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import javax.transaction.Transactional;
+
+import codereading.repository.UserRepository;
 import org.junit.Test;
 import static org.junit.Assert.*;
 import org.junit.runner.RunWith;
@@ -36,6 +38,9 @@ public class QuestionTest {
     @Autowired
     private QuestionRepository questionRepository;
 
+    @Autowired
+    private UserRepository userRepository;
+
     private MediaType contentType = new MediaType(MediaType.APPLICATION_JSON.getType(),
             MediaType.APPLICATION_JSON.getSubtype(),
             Charset.forName("utf8"));
@@ -55,7 +60,7 @@ public class QuestionTest {
     @Test
     public void whenSerializingQuestionItsQuestionSeriesIsSerializedOnlyAsId() throws IOException {
         QuestionSeries series = saveQuestionSeries();
-        Question question = saveQuestionAlongWithSeriesAndUser(series, new User());
+        Question question = saveQuestionAlongWithSeriesAndUser(series, new User("98982222"));
 
         assertTrue(json(question).contains("\"questionSeries\":" + series.getId()));
     }
@@ -64,8 +69,8 @@ public class QuestionTest {
     public void whenSerializingQuestionSeriesItsQuestionsSerializeTheQuestionSeriesFieldOnlyAsId() throws IOException {
         QuestionSeries series = saveQuestionSeries();
 
-        Question question1 = saveQuestionAlongWithSeriesAndUser(series, new User());
-        Question question2 = saveQuestionAlongWithSeriesAndUser(series, new User());
+        Question question1 = saveQuestionAlongWithSeriesAndUser(series, new User("98982223"));
+        Question question2 = saveQuestionAlongWithSeriesAndUser(series, new User("98982224"));
 
         List<Question> questions = new ArrayList<>();
         questions.add(question1);
@@ -81,7 +86,7 @@ public class QuestionTest {
     public void whenSerializingQuestionSeriesItsQuestionsSerializeTheCreatorFieldOnlyAsId() throws IOException {
         QuestionSeries series = saveQuestionSeries();
 
-        User user = new User();
+        User user = new User("333444551");
         Question question1 = saveQuestionAlongWithSeriesAndUser(series, user);
         Question question2 = saveQuestionAlongWithSeriesAndUser(series, user);
 
@@ -92,7 +97,7 @@ public class QuestionTest {
         series.setQuestions(questions);
         series = questionSeriesRepository.save(series);
 
-        assertTrue(json(series).contains("\"creator\":" + user.getId()));
+        assertTrue(json(series).contains("\"creator\":{\"id\":" + user.getId() + "}"));
     }
 
     private QuestionSeries saveQuestionSeries() {
@@ -101,6 +106,7 @@ public class QuestionTest {
     }
 
     private Question saveQuestionAlongWithSeriesAndUser(QuestionSeries series, User user) {
+        user = userRepository.save(user);
         Question question = new Question();
         question.setQuestionSeries(series);
         question.setCreator(user);

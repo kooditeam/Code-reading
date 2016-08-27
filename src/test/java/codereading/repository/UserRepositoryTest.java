@@ -44,7 +44,6 @@ public class UserRepositoryTest {
         User user2 = saveUser("020222222");
         User user3 = saveUser("020202022");
         User user4 = saveUser("022222222");
-        User user5 = saveUser(null);
 
         Long id = userRepository.idOfUserByStudentNumber("020202022");
         assertEquals(user3.getId(), id);

@@ -23,8 +23,6 @@ import org.springframework.http.converter.json.MappingJackson2HttpMessageConvert
 import org.springframework.mock.http.MockHttpOutputMessage;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 import org.springframework.test.context.ActiveProfiles;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -58,7 +56,7 @@ public class AnswerOptionTest {
 
     @Test
     public void serializingAnswerOptionItsQuestionIsSerializedOnlyAsId() throws IOException {
-        Question question = saveQuestion();
+        Question question = saveQuestion(0);
         AnswerOption option = saveAnswerOptionWithQuestion(question);
 
         assertTrue(json(option).contains("\"question\":" + question.getId()));
@@ -66,7 +64,7 @@ public class AnswerOptionTest {
 
     @Test
     public void serializingQuestionItsAnswerOptionsSerializeTheQuestionFieldOnlyAsId() throws IOException {
-        Question question = saveQuestion();
+        Question question = saveQuestion(1);
 
         AnswerOption option1 = saveAnswerOptionWithQuestion(question);
         AnswerOption option2 = saveAnswerOptionWithQuestion(question);
@@ -82,8 +80,10 @@ public class AnswerOptionTest {
         assertTrue(json(question).contains("\"id\":" + option2.getId() + ",\"question\":" + question.getId()));
     }
 
-    private Question saveQuestion() {
-        return questionRepository.save(new Question());
+    private Question saveQuestion(int i) {
+        Question question = new Question();
+        question.setCreator(new User("adfjöalj" + i));
+        return questionRepository.save(question);
     }
 
     private AnswerOption saveAnswerOptionWithQuestion(Question question) {

@@ -4,11 +4,13 @@ package codereading.service;
 import codereading.domain.AnswerOption;
 import codereading.domain.Question;
 import codereading.domain.QuestionSeries;
+import codereading.domain.User;
 import codereading.repository.AnswerOptionRepository;
 import codereading.repository.QuestionRepository;
 import codereading.repository.QuestionSeriesRepository;
 
 import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,22 +22,23 @@ public class QuestionSeriesService {
 
     @Autowired
     private QuestionRepository questionRepository;
-    
+
     @Autowired
     private AnswerOptionRepository answerOptionRepository;
 
-    /**
-     * Saves a newly made question to an already existing question series
-     * @param seriesId
-     * @param question
-     * @return the questionseries containing the newly made question
-     */
-    public QuestionSeries createQuestionToSeries(Long seriesId, Question question) {
+    @Autowired
+    private UserService userService;
+
+    public QuestionSeries createQuestionToSeries(Long seriesId, Question question,
+                                                 String studentNumber) {
+
         QuestionSeries series = questionSeriesRepository.findOne(seriesId);
+        User user = userService.getOrCreateUser(studentNumber);
 
         addQuestionToItsAnswerOptions(question);
         question.setQuestionSeries(series);
-        questionRepository.save(question);
+        question.setCreator(user);
+        question = questionRepository.save(question);
 
         series.addQuestion(question);
         return questionSeriesRepository.save(series);
@@ -45,21 +48,35 @@ public class QuestionSeriesService {
         return questionSeriesRepository.findAll();
     }
 
-    /**
-     * Saves the series to the database, also giving the info on the series
-     * itself to any questions that were posted with it.
-     * @param series A newly made QuestionSeries object
-     * @return the saved series
-     */
-    public QuestionSeries save(QuestionSeries series) {
+    public QuestionSeries save(QuestionSeries series, String studentNumber) {
+        if (studentNumberNotValid(studentNumber)) {
+            System.out.println("returning null");
+            return null;
+        }
+
+        User user = userService.getOrCreateUser(studentNumber);
+
+        setCreatorToQuestions(user, series.getQuestions());
         series = questionSeriesRepository.save(series);
 
         addSeriesToItsQuestions(series);
         return series;
     }
 
+    private void setCreatorToQuestions(User user, List<Question> questions) {
+        if (questions == null) {
+            return;
+        }
+
+        for (Question question : questions) {
+            question.setCreator(user);
+        }
+    }
+
     private void addSeriesToItsQuestions(QuestionSeries series) {
-        if (noQuestionsPosted(series)) return;
+        if (noQuestionsPosted(series)) {
+            return;
+        }
 
         for (Question question : series.getQuestions()) {
             question.setQuestionSeries(series);
@@ -70,7 +87,9 @@ public class QuestionSeriesService {
     }
 
     private void addQuestionToItsAnswerOptions(Question question) {
-        if (noAnswerOptionsPosted(question)) return;
+        if (noAnswerOptionsPosted(question)) {
+            return;
+        }
 
         for (AnswerOption answerOption : question.getAnswerOptions()) {
             answerOption.setQuestion(question);
@@ -85,5 +104,9 @@ public class QuestionSeriesService {
 
     private boolean noQuestionsPosted(QuestionSeries series) {
         return series.getQuestions() == null;
+    }
+
+    private boolean studentNumberNotValid(String studentNumber) {
+        return studentNumber == null || studentNumber.isEmpty();
     }
 }

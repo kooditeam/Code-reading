@@ -1,8 +1,10 @@
 
 package codereading.domain;
 
+import codereading.serializing.UserSerializer;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIdentityReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import java.util.List;
 import javax.persistence.CascadeType;
@@ -10,6 +12,9 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.validation.constraints.NotNull;
+
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.springframework.data.jpa.domain.AbstractPersistable;
 
 /**
@@ -25,9 +30,8 @@ public class Question extends AbstractPersistable<Long> {
 
     private String title;
 
-    @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="id")
-    @JsonIdentityReference(alwaysAsId=true)
-    @ManyToOne(cascade = CascadeType.PERSIST)
+    @NotNull
+    @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.DETACH})
     private User creator;
 
     @Column(columnDefinition="varchar(10000)")
@@ -44,6 +48,7 @@ public class Question extends AbstractPersistable<Long> {
     @ManyToOne
     private QuestionSeries questionSeries;
 
+    @JsonSerialize(using = UserSerializer.class)
     public User getCreator() {
         return creator;
     }
@@ -90,6 +95,12 @@ public class Question extends AbstractPersistable<Long> {
 
     public void setCode(String code) {
         this.code = code;
+    }
+
+    @JsonIgnore
+    @Override
+    public boolean isNew() {
+        return false;
     }
 
 }

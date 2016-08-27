@@ -1,11 +1,12 @@
 
 package codereading.controller;
 
-import codereading.domain.Question;
 import codereading.domain.QuestionSeries;
+import codereading.domain.SeriesUserAndQuestionWrapper;
 import codereading.service.QuestionSeriesService;
 
 import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -29,15 +30,21 @@ public class QuestionSeriesController {
     }
 
     @RequestMapping(value = "/new", method = RequestMethod.POST)
-    public QuestionSeries createQuestionSeries(@RequestBody QuestionSeries series) {
-        return questionSeriesService.save(series);
+    public QuestionSeries createQuestionSeries(
+            @RequestBody SeriesUserAndQuestionWrapper seriesAndUserWrapper) {
+
+        return questionSeriesService.save(seriesAndUserWrapper.getQuestionSeries(),
+                seriesAndUserWrapper.getStudentNumber());
+
     }
 
     @RequestMapping(value = "/{id}/questions/new", method = RequestMethod.POST)
     public QuestionSeries createQuestionForSeries(@PathVariable(value = "id") Long seriesId,
-            @RequestBody Question question) {
+            @RequestBody SeriesUserAndQuestionWrapper questionAndUserWrapper) {
 
-        return questionSeriesService.createQuestionToSeries(seriesId, question);
+        return questionSeriesService.createQuestionToSeries(seriesId,
+                questionAndUserWrapper.getQuestion(),
+                questionAndUserWrapper.getStudentNumber());
     }
 
 }

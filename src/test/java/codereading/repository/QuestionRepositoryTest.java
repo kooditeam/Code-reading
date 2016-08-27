@@ -40,7 +40,7 @@ public class QuestionRepositoryTest {
 
     @Test
     public void whenNoQuestionsInTheDatabaseThereAreNoUnansweredQuestionsForAUser() {
-        User user = saveUser();
+        User user = saveUser(1);
 
         assertTrue(questionRepository.count() == 0);
         assertTrue(questionRepository.questionsNotAnsweredCorrectly(user.getId()).isEmpty());
@@ -48,16 +48,16 @@ public class QuestionRepositoryTest {
 
     @Test
     public void withOneQuestionInTheDatabaseAndUserNotHavingAnsweredAnyReturnsThatOneQuestion() {
-        User user = saveUser();
-        Question question = saveQuestion();
+        User user = saveUser(2);
+        Question question = saveQuestion(10);
 
         assertTrue(questionRepository.questionsNotAnsweredCorrectly(user.getId()).size() == 1);
     }
 
     @Test
     public void withOneQuestionInTheDatabaseAndUserHavingAnsweredThatWrongReturnsThatOneAnswer() {
-        User user = saveUser();
-        Question question = saveQuestion();
+        User user = saveUser(3);
+        Question question = saveQuestion(11);
         saveAnswer(question, user, false);
 
         assertTrue(questionRepository.questionsNotAnsweredCorrectly(user.getId()).size() == 1);
@@ -65,8 +65,8 @@ public class QuestionRepositoryTest {
 
     @Test
     public void withOneQuestionInTheDatabaseAndUserHavingAnsweredThatCorrectlyReturnsEmptyList() {
-        User user = saveUser();
-        Question question = saveQuestion();
+        User user = saveUser(4);
+        Question question = saveQuestion(12);
         saveAnswer(question, user, true);
 
         assertTrue(questionRepository.questionsNotAnsweredCorrectly(user.getId()).isEmpty());
@@ -74,7 +74,7 @@ public class QuestionRepositoryTest {
 
     @Test
     public void withMultipleQuestionsInTheDatabaseAllOfThemAreUnansweredForUserAtStart() {
-        User user = saveUser();
+        User user = saveUser(5);
         saveMultipleQuestions(5);
 
         assertTrue(questionRepository.count() == 5);
@@ -83,7 +83,7 @@ public class QuestionRepositoryTest {
 
     @Test
     public void withMultipleQuestionsInTheDatabaseAndUserHavingAnsweredOnlyOneAndThatWasCorrectReturnsOnlyThatOneAnsweredQuestion() {
-        User user = saveUser();
+        User user = saveUser(6);
         Question question = saveMultipleQuestions(3).get(0);
 
         Answer answer = saveAnswer(question, user, true);
@@ -95,7 +95,7 @@ public class QuestionRepositoryTest {
 
     @Test
     public void withMultipleQuestionsInDatabaseAndUserHavingAnsweredOnlyOneThatWasWrongReturnsEmptyList() {
-        User user = saveUser();
+        User user = saveUser(7);
         Question question = saveMultipleQuestions(3).get(0);
 
         Answer answer = saveAnswer(question, user, false);
@@ -107,7 +107,7 @@ public class QuestionRepositoryTest {
 
     @Test
     public void withAllQuestionsAnsweredByAUserCorrectlyTheUserDoesNotHaveAnyUnansweredQuestions() {
-        User user = saveUser();
+        User user = saveUser(8);
         answerQuestionsCorrectly(saveMultipleQuestions(4), user);
 
         assertTrue(questionRepository.count() == 4);
@@ -116,7 +116,7 @@ public class QuestionRepositoryTest {
 
     @Test
     public void withAllQuestionsAnsweredByAUserWrongTheUserHasAllQuestionsStillUnansweredProperly() {
-        User user = saveUser();
+        User user = saveUser(9);
         answerQuestionsWrong(saveMultipleQuestions(4), user);
         
         assertTrue(questionRepository.count() == 4);
@@ -125,7 +125,7 @@ public class QuestionRepositoryTest {
 
     @Test
     public void someOfTheQuestionsAnsweredCorrectlyAndSomeWrongReturnsAllTheWronglyAnsweredQuestions() {
-        User user = saveUser();
+        User user = saveUser(10);
         answerQuestionsWrong(saveMultipleQuestions(3), user);
         answerQuestionsCorrectly(saveMultipleQuestions(2), user);
         
@@ -135,7 +135,7 @@ public class QuestionRepositoryTest {
 
     @Test
     public void someOfTheQuestionsAnsweredCorrectlyAndSomeWrongAndSomeNotAtAllReturnsAllWronglyAndUnansweredQuestions() {
-        User user = saveUser();
+        User user = saveUser(11);
         answerQuestionsWrong(saveMultipleQuestions(3), user);
         answerQuestionsCorrectly(saveMultipleQuestions(2), user);
         saveMultipleQuestions(3);
@@ -146,8 +146,8 @@ public class QuestionRepositoryTest {
 
     @Test
     public void answeredQuestionsByAnotherUserAreNotCountedAsAnsweredQuestionsForSelf() {
-        User user1 = saveUser();
-        User user2 = saveUser();
+        User user1 = saveUser(12);
+        User user2 = saveUser(13);
 
         answerQuestionsCorrectly(saveMultipleQuestions(2), user1);
 
@@ -173,18 +173,19 @@ public class QuestionRepositoryTest {
     private List<Question> saveMultipleQuestions(int amount) {
         List<Question> questions = new ArrayList<>();
         for (int i = 1; i <= amount; i++) {
-            questions.add(saveQuestion());
+            questions.add(saveQuestion(i));
         }
         return questions;
     }
 
-    private Question saveQuestion() {
+    private Question saveQuestion(int i) {
         Question question = new Question();
+        question.setCreator(new User("sjjsjss" + i));
         return questionRepository.save(question);
     }
 
-    private User saveUser() {
-        User user = new User();
+    private User saveUser(int i) {
+        User user = new User("0112314" + i);
         return userRepository.save(user);
     }
 

@@ -12,6 +12,10 @@ public class UserService {
     private UserRepository userRepository;
 
     User getOrCreateUser(String studentNumber) {
+        if (studentNumber == null || studentNumber.isEmpty()) {
+            return null;
+        }
+
         User user = userRepository.findByStudentNumber(studentNumber);
         if (user == null) {
             user = userRepository.save(new User(studentNumber));

@@ -1,6 +1,7 @@
 
 package codereading.domain;
 
+import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.Entity;
 import javax.persistence.OneToMany;
@@ -54,5 +55,12 @@ public class User extends AbstractPersistable<Long> {
 
     public void setStudentNumber(String studentNumber) {
         this.studentNumber = studentNumber;
+    }
+
+    public void addAnswer(Answer answer) {
+        if (answers == null) {
+            answers = new ArrayList<>();
+        }
+        answers.add(answer);
     }
 }

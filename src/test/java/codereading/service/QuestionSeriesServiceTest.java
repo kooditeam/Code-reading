@@ -14,6 +14,8 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.transaction.Transactional;
 import static org.junit.Assert.*;
+
+import codereading.repository.UserRepository;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,6 +42,9 @@ public class QuestionSeriesServiceTest {
 
     @Autowired
     private AnswerOptionRepository answerOptionRepository;
+
+    @Autowired
+    private UserRepository userRepository;
 
     @Test
     public void creatingQuestionForExistingSeriesSavesItToTheDatabase() {
@@ -95,7 +100,7 @@ public class QuestionSeriesServiceTest {
     }
 
     @Test
-    public void creatingQuestionWithAnswerOptionsForExistingSeriesAddsTheAnswerOptionsToTheQuestion() {
+    public void creatingQuestionWithAnswerOptionsForExistingSeriesAddsTheAnswerOptionsToTheQuestionWhenUserIsNew() {
         QuestionSeries series = saveQuestionSeries();
         Question question = new Question();
 
@@ -107,8 +112,21 @@ public class QuestionSeriesServiceTest {
         assertTrue(question.getAnswerOptions().size() == 2);
     }
 
+    public void creatingQuestionWithAnswerOptionsForExistingSeriesAddsTheAnswerOptionsToTheQuestionWhenUserIsInDatabaseAlready() {
+        User user = userRepository.save(new User("0445511"));
+        QuestionSeries series = saveQuestionSeries();
+        Question question = new Question();
+
+        question = createAnswerOptionsForQuestion(question, 3);
+
+        questionSeriesService.createQuestionToSeries(series.getId(), question, user.getStudentNumber());
+
+        assertNotNull(question.getAnswerOptions());
+        assertTrue(question.getAnswerOptions().size() == 2);
+    }
+
     @Test
-    public void creatingQuestionWIthAnswerOptionsForExistingSeriesAddsTheQuestionToTheAnswerOptions() {        
+    public void creatingQuestionWIthAnswerOptionsForExistingSeriesAddsTheQuestionToTheAnswerOptionsWhenUserIsNew() {
         QuestionSeries series = saveQuestionSeries();
 
         Question question = saveQuestion(5);
@@ -124,6 +142,20 @@ public class QuestionSeriesServiceTest {
         assertNotNull(option1.getQuestion());
         assertEquals(question.getId(), option1.getQuestion().getId());
         assertEquals(question.getId(), option2.getQuestion().getId());
+    }
+
+    public void creatingQuestionAddsItToTheUser() {
+        User user = userRepository.save(new User("041231232"));
+        QuestionSeries series = saveQuestionSeries();
+        Question question = new Question();
+        question.setTitle("testTitle");
+
+        question = createAnswerOptionsForQuestion(question, 2);
+
+        questionSeriesService.createQuestionToSeries(series.getId(), question, user.getStudentNumber());
+
+        assertTrue(user.getCreatedQuestions().size() == 1);
+        assertEquals(question.getTitle(), user.getCreatedQuestions().get(0).getTitle());
     }
 
     @Test
@@ -200,10 +232,7 @@ public class QuestionSeriesServiceTest {
     }
 
     private QuestionSeries saveQuestionSeries() {
-        QuestionSeries series = new QuestionSeries();
-        series = questionSeriesRepository.save(series);
-
-        return series;
+        return questionSeriesRepository.save(new QuestionSeries());
     }
 
     private Question saveQuestion(int i) {

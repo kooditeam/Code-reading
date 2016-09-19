@@ -31,9 +31,14 @@ public class QuestionSeriesService {
 
     public QuestionSeries createQuestionToSeries(Long seriesId, Question question,
                                                  String studentNumber) {
+        User user = userService.getOrCreateUser(studentNumber);
+
+        if (user == null) {
+            return null;
+        }
+        question.setCreator(user);
 
         QuestionSeries series = questionSeriesRepository.findOne(seriesId);
-        User user = userService.getOrCreateUser(studentNumber);
 
         addQuestionToItsAnswerOptions(question);
         question.setQuestionSeries(series);
@@ -50,7 +55,6 @@ public class QuestionSeriesService {
 
     public QuestionSeries save(QuestionSeries series, String studentNumber) {
         if (studentNumberNotValid(studentNumber)) {
-            System.out.println("returning null");
             return null;
         }
 

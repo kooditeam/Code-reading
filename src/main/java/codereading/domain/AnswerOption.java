@@ -1,38 +1,32 @@
 
 package codereading.domain;
 
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.JsonIdentityReference;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import codereading.serializing.QuestionSerializer;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
+
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.springframework.data.jpa.domain.AbstractPersistable;
 
 /**
  * Answer option belongs to question, which can have multiple answer options.
- * Each answer option has text to tell the user what the option is, and info
- * whether the answer option is the correct one to the question or not. When
- * an answer option is serialized to JSON, its question field's info is 
- * serialized only as its id.
+ * The explanation field can be used to tell why the option was wrong or right.
  */
 @Entity
 public class AnswerOption extends AbstractPersistable<Long> {
 
-    @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="id")
-    @JsonIdentityReference(alwaysAsId=true)
-    @ManyToOne
+    @JsonSerialize(using = QuestionSerializer.class)
+    @ManyToOne(cascade = CascadeType.PERSIST)
     private Question question;
 
     private String answerText;
-    private boolean isCorrect;
+    private Boolean isCorrect;
+
+    private String explanation;
 
     public Question getQuestion() {
         return question;
-    }
-
-    public boolean isIsCorrect() {
-        return isCorrect;
     }
 
     public void setQuestion(Question question) {
@@ -43,7 +37,7 @@ public class AnswerOption extends AbstractPersistable<Long> {
         return answerText;
     }
 
-    public boolean getIsCorrect() {
+    public Boolean getIsCorrect() {
         return isCorrect;
     }
 
@@ -55,4 +49,11 @@ public class AnswerOption extends AbstractPersistable<Long> {
         this.isCorrect = isCorrect;
     }
 
+    public String getExplanation() {
+        return explanation;
+    }
+
+    public void setExplanation(String explanation) {
+        this.explanation = explanation;
+    }
 }

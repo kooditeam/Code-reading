@@ -3,6 +3,9 @@ package codereading.domain;
 
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
+
+import codereading.serializing.UserSerializer;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.springframework.data.jpa.domain.AbstractPersistable;
 
 /**
@@ -15,6 +18,7 @@ public class Answer extends AbstractPersistable<Long> {
     @ManyToOne
     private AnswerOption answerOption;
 
+    @JsonSerialize(using = UserSerializer.class)
     @ManyToOne
     private User answerer;
 

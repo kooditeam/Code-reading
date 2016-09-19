@@ -1,6 +1,7 @@
 
 package codereading.domain;
 
+import codereading.serializing.AnswerOptionSerializer;
 import codereading.serializing.UserSerializer;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIdentityReference;
@@ -37,6 +38,7 @@ public class Question extends AbstractPersistable<Long> {
     @Column(columnDefinition="varchar(10000)")
     private String code;
 
+    @JsonSerialize(using = AnswerOptionSerializer.class)
     @OneToMany(cascade = CascadeType.ALL)
     private List<AnswerOption> answerOptions;
 

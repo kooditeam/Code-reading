@@ -35,7 +35,6 @@ public class QuestionSeriesController {
 
         return questionSeriesService.save(seriesAndUserWrapper.getQuestionSeries(),
                 seriesAndUserWrapper.getStudentNumber());
-
     }
 
     @RequestMapping(value = "/{id}/questions/new", method = RequestMethod.POST)

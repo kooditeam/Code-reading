@@ -29,7 +29,7 @@ public class Question extends AbstractPersistable<Long> {
     private String title;
 
     @NotNull
-    @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.DETACH})
+    @ManyToOne
     private User creator;
 
     @Column(columnDefinition="varchar(10000)")
@@ -44,7 +44,7 @@ public class Question extends AbstractPersistable<Long> {
 
     @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="id")
     @JsonIdentityReference(alwaysAsId=true)
-    @ManyToOne(cascade = {CascadeType.PERSIST})
+    @ManyToOne
     private QuestionSeries questionSeries;
 
     @JsonSerialize(using = UserSerializer.class)

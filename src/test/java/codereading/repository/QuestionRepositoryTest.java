@@ -122,7 +122,7 @@ public class QuestionRepositoryTest {
     public void withAllQuestionsAnsweredByAUserWrongTheUserHasAllQuestionsStillUnansweredProperly() {
         User user = saveUser(9);
         answerQuestionsWrong(saveMultipleQuestions(4, new QuestionSeries()), user);
-        
+
         assertTrue(questionRepository.count() == 4);
         assertTrue(questionRepository.questionsNotAnsweredCorrectly(user.getId()).size() == 4);
     }
@@ -192,6 +192,7 @@ public class QuestionRepositoryTest {
     }
 
     private List<Question> saveMultipleQuestions(int amount, QuestionSeries series) {
+        series = questionSeriesRepository.save(series);
         List<Question> questions = new ArrayList<>();
         for (int i = 1; i <= amount; i++) {
             questions.add(saveQuestion(i, series));
@@ -200,8 +201,10 @@ public class QuestionRepositoryTest {
     }
 
     private Question saveQuestion(int i, QuestionSeries series) {
+        series = questionSeriesRepository.save(series);
         Question question = new Question();
-        question.setCreator(new User("sjjsjss" + i));
+        User user = userRepository.save(new User("sjjsjss" + i));
+        question.setCreator(user);
         question.setQuestionSeries(series);
 
         return questionRepository.save(question);

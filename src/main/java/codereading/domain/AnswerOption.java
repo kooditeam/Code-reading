@@ -2,7 +2,6 @@
 package codereading.domain;
 
 import codereading.serializing.QuestionSerializer;
-import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 
@@ -17,7 +16,7 @@ import org.springframework.data.jpa.domain.AbstractPersistable;
 public class AnswerOption extends AbstractPersistable<Long> {
 
     @JsonSerialize(using = QuestionSerializer.class)
-    @ManyToOne(cascade = CascadeType.PERSIST)
+    @ManyToOne
     private Question question;
 
     private String answerText;

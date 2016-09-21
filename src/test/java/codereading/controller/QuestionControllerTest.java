@@ -8,6 +8,8 @@ import codereading.repository.QuestionRepository;
 import java.io.IOException;
 
 import static org.junit.Assert.assertTrue;
+
+import codereading.repository.UserRepository;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.junit.Before;
 import org.junit.Test;
@@ -39,6 +41,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class QuestionControllerTest {
     
     private final String API_URI = "/questions";
+
+    @Autowired
+    private UserRepository userRepository;
     
     @Autowired
     private QuestionRepository questionRepository;
@@ -98,7 +103,8 @@ public class QuestionControllerTest {
         question.setTitle("testTitle2");
         question.setCode("testCode2");
         question.setInfo("testInfo2");
-        question.setCreator(new User("743432423" + i));
+        User user = userRepository.save(new User("743432423" + i));
+        question.setCreator(user);
         
         return questionRepository.save(question);
     }

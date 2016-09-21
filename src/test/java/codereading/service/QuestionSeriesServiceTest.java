@@ -61,16 +61,15 @@ public class QuestionSeriesServiceTest {
     @Test
     public void creatingQuestionForExistingSeriesSavesItToTheQuestionSeries() {
         QuestionSeries series = saveQuestionSeries();
+        User user = userRepository.save(new User("032111133"));
         Question question = new Question();
-        question.setCreator(new User("032111133"));
+        question.setCreator(user);
         question = questionRepository.save(question);
 
         series = questionSeriesService.createQuestionToSeries(series.getId(), question, "02312312");
 
         assertNotNull(series.getQuestions());
         assertTrue(series.getQuestions().size() == 1);
-        System.out.println("series questions are: " + series.getQuestions());
-        System.out.println("question id is: " + question.getId());
         assertEquals(question.getId(), series.getQuestions().get(0).getId());
     }
 
@@ -237,7 +236,8 @@ public class QuestionSeriesServiceTest {
 
     private Question saveQuestion(int i) {
         Question question = new Question();
-        question.setCreator(new User("sjdfja" + i));
+        User user = userRepository.save(new User("sjdfja" + i));
+        question.setCreator(user);
 
         return questionRepository.save(question);
     }

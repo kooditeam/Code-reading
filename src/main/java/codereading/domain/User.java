@@ -3,6 +3,7 @@ package codereading.domain;
 
 import java.util.ArrayList;
 import java.util.List;
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.OneToMany;
 import javax.validation.constraints.NotNull;
@@ -21,10 +22,10 @@ public class User extends AbstractPersistable<Long> {
     @NotBlank
     private String studentNumber;
 
-    @OneToMany
+    @OneToMany(cascade = CascadeType.ALL)
     private List<Answer> answers;
 
-    @OneToMany
+    @OneToMany(cascade = CascadeType.ALL)
     private List<Question> createdQuestions;
 
     public User() {}

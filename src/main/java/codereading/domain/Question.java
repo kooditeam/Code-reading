@@ -1,18 +1,14 @@
 
 package codereading.domain;
 
-import codereading.serializing.AnswerOptionSerializer;
+import codereading.serializing.QuestionSeriesSerializer;
 import codereading.serializing.UserSerializer;
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.JsonIdentityReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import java.util.List;
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -28,26 +24,21 @@ public class Question extends AbstractPersistable<Long> {
 
     private String title;
 
-    @NotNull
-    @ManyToOne
-    private User creator;
-
     @Column(columnDefinition="varchar(10000)")
     private String info;
 
     @Column(columnDefinition="varchar(10000)")
     private String code;
 
-    @JsonSerialize(using = AnswerOptionSerializer.class)
-    @OneToMany(cascade = CascadeType.ALL)
-    private List<AnswerOption> answerOptions;
+    @JsonSerialize(using = UserSerializer.class)
+    @NotNull
+    @ManyToOne
+    private User creator;
 
-    @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="id")
-    @JsonIdentityReference(alwaysAsId=true)
+    @JsonSerialize(using = QuestionSeriesSerializer.class)
     @ManyToOne
     private QuestionSeries questionSeries;
 
-    @JsonSerialize(using = UserSerializer.class)
     public User getCreator() {
         return creator;
     }
@@ -62,14 +53,6 @@ public class Question extends AbstractPersistable<Long> {
 
     public void setQuestionSeries(QuestionSeries questionSeries) {
         this.questionSeries = questionSeries;
-    }
-
-    public List<AnswerOption> getAnswerOptions() {
-        return answerOptions;
-    }
-
-    public void setAnswerOptions(List<AnswerOption> answerOptions) {
-        this.answerOptions = answerOptions;
     }
 
     public String getTitle() {

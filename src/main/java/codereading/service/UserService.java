@@ -11,7 +11,7 @@ public class UserService {
     @Autowired
     private UserRepository userRepository;
 
-    User getOrCreateUser(String studentNumber) {
+    User getExistingOrNewUser(String studentNumber) {
         if (studentNumber == null || studentNumber.isEmpty()) {
             return null;
         }
@@ -20,6 +20,7 @@ public class UserService {
         if (user == null) {
             user = userRepository.save(new User(studentNumber));
         }
+
         return user;
     }
 }

@@ -5,6 +5,7 @@ import codereading.Main;
 import codereading.domain.AnswerOption;
 import codereading.domain.Question;
 import codereading.domain.QuestionSeries;
+import codereading.domain.SeriesRequestWrapper;
 import codereading.domain.User;
 import codereading.repository.AnswerOptionRepository;
 import codereading.repository.QuestionRepository;
@@ -47,150 +48,162 @@ public class QuestionSeriesServiceTest {
     private UserRepository userRepository;
 
     @Test
+    public void creatingSeriesWithoutQuestionSavesTheSeriesToDatabase() throws Exception {
+        QuestionSeries series = new QuestionSeries();
+        List<AnswerOption> answerOptions = createAnswerOptionsForQuestion(3);
+
+        questionSeriesService.createNewSeries(series, null, "02312311", answerOptions);
+
+        assertTrue(questionSeriesRepository.count() == 1);
+        assertTrue(questionRepository.count() == 0);
+    }
+
+    @Test
+    public void tryingToCreateSeriesWithNullSeriesDoesNotSaveAnythingToDatabase() throws Exception {
+        List<AnswerOption> answerOptions = createAnswerOptionsForQuestion(3);
+        questionSeriesService.createNewSeries(null, new Question(), "02312312", answerOptions);
+
+        assertTrue(questionSeriesRepository.count() == 0);
+        assertTrue(questionRepository.count() == 0);
+        assertTrue(userRepository.count() == 0);
+    }
+
+    @Test
+    public void creatingSeriesWithQuestionSavesBothToDatabase() throws Exception {
+        QuestionSeries series = new QuestionSeries();
+        List<AnswerOption> answerOptions = createAnswerOptionsForQuestion(3);
+
+        questionSeriesService.createNewSeries(series, new Question(), "02312313", answerOptions);
+
+        assertTrue(questionSeriesRepository.count() == 1);
+        assertTrue(questionRepository.count() == 1);
+    }
+
+    @Test
+    public void creatingSeriesWithQuestionAddTheSeriesInfoToTheQuestion() throws Exception {
+        QuestionSeries series = new QuestionSeries();
+        series.setTitle("testTitle1");
+        List<AnswerOption> answerOptions = createAnswerOptionsForQuestion(3);
+
+        questionSeriesService.createNewSeries(series, new Question(), "02312314", answerOptions);
+
+        assertTrue(questionSeriesRepository.count() == 1);
+        assertTrue(questionRepository.count() == 1);
+
+        Question question = questionRepository.findAll().get(0);
+        assertEquals(series.getTitle(), question.getQuestionSeries().getTitle());
+    }
+
+    @Test
+    public void creatingSeriesWithQuestionAddTheSeriesInfoToItsCreator() throws Exception {
+        QuestionSeries series = new QuestionSeries();
+        series.setTitle("testTitle1");
+        List<AnswerOption> answerOptions = createAnswerOptionsForQuestion(3);
+
+        questionSeriesService.createNewSeries(series, new Question(), "02312315", answerOptions);
+
+        assertTrue(questionRepository.count() == 1);
+        assertTrue(userRepository.count() == 1);
+
+        Question question = questionRepository.findAll().get(0);
+        User user = userRepository.findAll().get(0);
+        assertEquals(user.getStudentNumber(), question.getCreator().getStudentNumber());
+    }
+
+    @Test
     public void creatingQuestionForExistingSeriesSavesItToTheDatabase() {
-        Long questionCount = questionRepository.count();
+        QuestionSeries series = new QuestionSeries();
+        questionSeriesRepository.save(series);
+        List<AnswerOption> answerOptions = createAnswerOptionsForQuestion(3);
 
-        QuestionSeries series = saveQuestionSeries();
-        Question question = createUnsavedQuestion(0);
+        questionSeriesService.createQuestionToSeries(series.getId(), new Question(), "02312316",
+                answerOptions);
 
-        questionSeriesService.createQuestionToSeries(series.getId(), question, "02312311");
-
-        assertTrue(questionRepository.count() == questionCount + 1);
-    }
-
-    @Test
-    public void creatingQuestionForExistingSeriesSavesItToTheQuestionSeries() {
-        QuestionSeries series = saveQuestionSeries();
-        User user = userRepository.save(new User("032111133"));
-        Question question = new Question();
-        question.setCreator(user);
-        question = questionRepository.save(question);
-
-        series = questionSeriesService.createQuestionToSeries(series.getId(), question, "02312312");
-
-        assertNotNull(series.getQuestions());
-        assertTrue(series.getQuestions().size() == 1);
-        assertEquals(question.getId(), series.getQuestions().get(0).getId());
-    }
-
-    @Test
-    public void creatingQuestionForExistingSeriesSavesTheSeriesToTheNewlyMadeQuestion() {
-        QuestionSeries series = saveQuestionSeries();
-        Question question = new Question();
-
-        series = questionSeriesService.createQuestionToSeries(series.getId(), question, "02312313");
-
-        assertNotNull(question.getQuestionSeries());
-        assertEquals(series.getId(), question.getQuestionSeries().getId());
+        assertTrue(questionRepository.count() == 1);
     }
 
     @Test
     public void creatingQuestionWithAnswerOptionsForExistingSeriesSavesTheAnswerOptionsToDatabase() {
-        Long answerOptionCount = answerOptionRepository.count();
+        QuestionSeries series = new QuestionSeries();
+        questionSeriesRepository.save(series);
 
-        QuestionSeries series = saveQuestionSeries();
         Question question = new Question();
+        List<AnswerOption> answerOptions = createAnswerOptionsForQuestion(2);
 
-        question = createAnswerOptionsForQuestion(question, 2);
+        questionSeriesService.createQuestionToSeries(series.getId(), question, "023123113", answerOptions);
 
-        questionSeriesService.createQuestionToSeries(series.getId(), question, "023123113");
-
-        assertTrue(answerOptionRepository.count() == answerOptionCount + 2);
+        assertTrue(answerOptionRepository.count() == 2);
     }
 
     @Test
-    public void creatingQuestionWithAnswerOptionsForExistingSeriesAddsTheAnswerOptionsToTheQuestionWhenUserIsNew() {
-        QuestionSeries series = saveQuestionSeries();
+    public void creatingQuestionWIthAnswerOptionsForExistingSeriesAddsTheQuestionToTheAnswerOptions() {
+        QuestionSeries series = new QuestionSeries();
+        questionSeriesRepository.save(series);
+        List<AnswerOption> answerOptions = createAnswerOptionsForQuestion(2);
+
         Question question = new Question();
+        question.setTitle("questionTitle");
 
-        question = createAnswerOptionsForQuestion(question, 2);
+        questionSeriesService.createQuestionToSeries(series.getId(), question, "02312313", answerOptions);
 
-        questionSeriesService.createQuestionToSeries(series.getId(), question, "12453212");
+        assertTrue(answerOptionRepository.count() == 2);
+        AnswerOption option1 = answerOptionRepository.findAll().get(0);
+        AnswerOption option2 = answerOptionRepository.findAll().get(1);
 
-        assertNotNull(question.getAnswerOptions());
-        assertTrue(question.getAnswerOptions().size() == 2);
+        assertTrue(questionRepository.count() == 1);
+        question = questionRepository.findAll().get(0);
+
+        assertNotNull(option1.getQuestion());
+        assertNotNull(option2.getQuestion());
+        assertEquals(question.getTitle(), option1.getQuestion().getTitle());
+        assertEquals(question.getTitle(), option2.getQuestion().getTitle());
     }
 
-    public void creatingQuestionWithAnswerOptionsForExistingSeriesAddsTheAnswerOptionsToTheQuestionWhenUserIsInDatabaseAlready() {
-        User user = userRepository.save(new User("0445511"));
-        QuestionSeries series = saveQuestionSeries();
-        Question question = new Question();
-
-        question = createAnswerOptionsForQuestion(question, 3);
-
-        questionSeriesService.createQuestionToSeries(series.getId(), question, user.getStudentNumber());
-
-        assertNotNull(question.getAnswerOptions());
-        assertTrue(question.getAnswerOptions().size() == 2);
-    }
 
     @Test
-    public void creatingQuestionWIthAnswerOptionsForExistingSeriesAddsTheQuestionToTheAnswerOptionsWhenUserIsNew() {
-        QuestionSeries series = saveQuestionSeries();
-
-        Question question = saveQuestion(5);
-
-        question = createAnswerOptionsForQuestion(question, 2);
-
-        questionSeriesService.createQuestionToSeries(series.getId(), question, "02312313");
-
-        AnswerOption option1 = question.getAnswerOptions().get(0);
-        AnswerOption option2 = question.getAnswerOptions().get(1);
-
-        assertNotNull(option1.getQuestion());
-        assertNotNull(option1.getQuestion());
-        assertEquals(question.getId(), option1.getQuestion().getId());
-        assertEquals(question.getId(), option2.getQuestion().getId());
-    }
-
-    public void creatingQuestionAddsItToTheUser() {
+    public void creatingQuestionToSeriesAddsTheCreatorInfoToTheQuestion() {
         User user = userRepository.save(new User("041231232"));
-        QuestionSeries series = saveQuestionSeries();
+        QuestionSeries series = new QuestionSeries();
+        questionSeriesRepository.save(series);
         Question question = new Question();
         question.setTitle("testTitle");
+        List<AnswerOption> answerOptions = createAnswerOptionsForQuestion(3);
 
-        question = createAnswerOptionsForQuestion(question, 2);
+        questionSeriesService.createQuestionToSeries(series.getId(), question, user.getStudentNumber(), answerOptions);
 
-        questionSeriesService.createQuestionToSeries(series.getId(), question, user.getStudentNumber());
+        assertTrue(questionRepository.count() == 1);
+        question = questionRepository.findAll().get(0);
 
-        assertTrue(user.getCreatedQuestions().size() == 1);
-        assertEquals(question.getTitle(), user.getCreatedQuestions().get(0).getTitle());
+        assertNotNull(question.getCreator());
+        assertEquals(user.getStudentNumber(), question.getCreator().getStudentNumber());
     }
 
     @Test
     public void creatingNewQuestionSeriesSavesItToTheDatabase() {
-        Long seriesCount = questionSeriesRepository.count();
-
         QuestionSeries series = new QuestionSeries();
-        questionSeriesService.save(series, "011111113");
+        questionSeriesService.createNewSeries(series, null, "011111113", null);
 
-        assertTrue(questionSeriesRepository.count() == seriesCount + 1);
+        assertTrue(questionSeriesRepository.count() ==  1);
     }
 
     @Test
     public void creatingNewSeriesWithQuestionsSavesAlsoTheQuestionsToDatabase() {
-        Long questionCount = questionRepository.count();
-
         QuestionSeries series = new QuestionSeries();
-        series.addQuestion(new Question());
-        series.addQuestion(new Question());
+        Question question = new Question();
 
-        questionSeriesService.save(series, "011111112");
+        questionSeriesService.createNewSeries(series, question, "011111112", createAnswerOptionsForQuestion(2));
 
-        assertTrue(questionRepository.count() == questionCount + 2);
+        assertTrue(questionRepository.count() == 1);
     }
 
     @Test
-    public void creatingNewSeriesWithQuestionsThatHaveAnswerOptionsSavesAlsoTheAnswerOptionsToDatabase() {
-        Long optionCount = answerOptionRepository.count();
-
+    public void creatingNewSeriesWithQuestionSavesAlsoTheAnswerOptionsToDatabase() {
         QuestionSeries series = new QuestionSeries();
         Question question = new Question();
-        series.addQuestion(question);
-        createAnswerOptionsForQuestion(question, 2);
 
-        questionSeriesService.save(series, "011111114");
-        assertTrue(answerOptionRepository.count() == optionCount + 2);
+         questionSeriesService.createNewSeries(series, question, "011111114", createAnswerOptionsForQuestion(2));
+
+        assertTrue(answerOptionRepository.count() == 2);
     }
 
     @Test
@@ -198,9 +211,14 @@ public class QuestionSeriesServiceTest {
         QuestionSeries series = new QuestionSeries();
         Question question = new Question();
 
-        series.addQuestion(question);
-        questionSeriesService.save(series, "011111115");
+        questionSeriesService.createNewSeries(series, question, "011111115", createAnswerOptionsForQuestion(2));
 
+        assertTrue(questionRepository.count() == 1);
+
+        assertTrue(questionSeriesRepository.count() == 1);
+        series = questionSeriesRepository.findAll().get(0);
+
+        assertNotNull(question.getQuestionSeries());
         assertEquals(series.getId(), question.getQuestionSeries().getId());
     }
 
@@ -208,44 +226,65 @@ public class QuestionSeriesServiceTest {
     public void creatingNewSeriesWithQuestionThatHasAnswerOptionsAddsTheQuestionToTheOptions() {
         QuestionSeries series = new QuestionSeries();
         Question question = new Question();
-        createAnswerOptionsForQuestion(question, 2);
 
-        series.addQuestion(question);
-        questionSeriesService.save(series, "011111116");
+        questionSeriesService.createNewSeries(series, question, "011111115", createAnswerOptionsForQuestion(2));
 
-        AnswerOption option1 = question.getAnswerOptions().get(0);
-        AnswerOption option2 = question.getAnswerOptions().get(1);
+        assertTrue(answerOptionRepository.count() == 2);
+        List<AnswerOption> options = answerOptionRepository.findAll();
 
-        assertEquals(question.getId(), option1.getQuestion().getId());
-        assertEquals(question.getId(), option2.getQuestion().getId());
+        assertTrue(questionRepository.count() == 1);
+        question = questionRepository.findAll().get(0);
+
+        for (AnswerOption option : options) {
+            assertNotNull(option.getQuestion());
+            assertEquals(question.getId(), option.getQuestion().getId());
+        }
     }
 
-    private Question createAnswerOptionsForQuestion(Question question, int amountOfOptions) {
+    @Test
+    public void creatingSeriesWithoutAnyQuestionsSavesTheSeriesToTheDatabase() {
+        QuestionSeries series = new QuestionSeries();
+        questionSeriesService.createNewSeries(series, null, "011111115", null);
+
+        assertTrue(questionSeriesRepository.count() == 1);
+    }
+
+    @Test
+    public void creatingNewSeriesWithoutQuestionsReturnsObjectWithTheSeriesAndUsernameInfo() {
+        QuestionSeries series = new QuestionSeries();
+        SeriesRequestWrapper wrapper = questionSeriesService.createNewSeries(series, null, "011111116", null);
+
+        assertNotNull(wrapper);
+        assertNotNull(wrapper.getQuestionSeries());
+        assertNotNull(wrapper.getQuestionSeries().getId());
+        assertEquals("011111116", wrapper.getStudentNumber());
+        assertNull(wrapper.getQuestion());
+        assertNull(wrapper.getAnswerOptions());
+    }
+
+    @Test
+    public void creatingNewSeriesWithQuestionsReturnsObjectWithTheSeriesUserNameQuestionAndAnswerOptionsInfo() {
+        QuestionSeries series = new QuestionSeries();
+        SeriesRequestWrapper wrapper = questionSeriesService.createNewSeries(series, new Question(), "011111116", createAnswerOptionsForQuestion(2));
+
+        assertNotNull(wrapper);
+        assertNotNull(wrapper.getQuestionSeries());
+        assertNotNull(wrapper.getQuestionSeries().getId());
+        assertEquals("011111116", wrapper.getStudentNumber());
+
+        assertNotNull(wrapper.getQuestion());
+        assertNotNull(wrapper.getQuestion().getId());
+
+        assertNotNull(wrapper.getAnswerOptions());
+        assertTrue(wrapper.getAnswerOptions().size() == 2);
+    }
+
+    private List<AnswerOption> createAnswerOptionsForQuestion(int amountOfOptions) {
         List<AnswerOption> options = new ArrayList<>();
         for (int i = 1; i <= amountOfOptions; i++) {
             options.add(new AnswerOption());
         }
 
-        question.setAnswerOptions(options);
-        return question;
-    }
-
-    private QuestionSeries saveQuestionSeries() {
-        return questionSeriesRepository.save(new QuestionSeries());
-    }
-
-    private Question saveQuestion(int i) {
-        Question question = new Question();
-        User user = userRepository.save(new User("sjdfja" + i));
-        question.setCreator(user);
-
-        return questionRepository.save(question);
-    }
-
-    private Question createUnsavedQuestion(int i) {
-        Question question = new Question();
-        question.setCreator(new User("03466543" + i));
-
-        return question;
+        return options;
     }
 }

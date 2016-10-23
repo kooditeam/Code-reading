@@ -2,10 +2,8 @@
 package codereading.controller;
 
 import codereading.domain.QuestionSeries;
-import codereading.domain.SeriesUserAndQuestionWrapper;
+import codereading.domain.SeriesRequestWrapper;
 import codereading.service.QuestionSeriesService;
-
-import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -24,26 +22,24 @@ public class QuestionSeriesController {
     @Autowired
     private QuestionSeriesService questionSeriesService;
 
-    @RequestMapping(method = RequestMethod.GET)
-    public List<QuestionSeries> allQuestionSeries() {
-        return questionSeriesService.findAll();
-    }
-
     @RequestMapping(value = "/new", method = RequestMethod.POST)
-    public QuestionSeries createQuestionSeries(
-            @RequestBody SeriesUserAndQuestionWrapper seriesAndUserWrapper) {
+    public SeriesRequestWrapper createNewQuestionSeries(
+            @RequestBody SeriesRequestWrapper newSeriesWrapper) {
 
-        return questionSeriesService.save(seriesAndUserWrapper.getQuestionSeries(),
-                seriesAndUserWrapper.getStudentNumber());
+        return questionSeriesService.createNewSeries(newSeriesWrapper.getQuestionSeries(),
+                newSeriesWrapper.getQuestion(),
+                newSeriesWrapper.getStudentNumber(),
+                newSeriesWrapper.getAnswerOptions());
     }
 
     @RequestMapping(value = "/{id}/questions/new", method = RequestMethod.POST)
-    public QuestionSeries createQuestionForSeries(@PathVariable(value = "id") Long seriesId,
-            @RequestBody SeriesUserAndQuestionWrapper questionAndUserWrapper) {
+    public SeriesRequestWrapper createQuestionForSeries(@PathVariable(value = "id") Long seriesId,
+            @RequestBody SeriesRequestWrapper questionUserAndOptionsWrapper) {
 
         return questionSeriesService.createQuestionToSeries(seriesId,
-                questionAndUserWrapper.getQuestion(),
-                questionAndUserWrapper.getStudentNumber());
+                questionUserAndOptionsWrapper.getQuestion(),
+                questionUserAndOptionsWrapper.getStudentNumber(),
+                questionUserAndOptionsWrapper.getAnswerOptions());
     }
 
 }

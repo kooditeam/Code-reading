@@ -43,10 +43,7 @@ public class DevProfile {
         List<AnswerOption> options = new ArrayList<>();
         options.add(option1);
         options.add(option2);
-        question1.setAnswerOptions(options);
 
-        series1.addQuestion(question1);
-
-        questionSeriesService.save(series1, "011111111");
+        questionSeriesService.createNewSeries(series1, question1, "011111111", options);
     }
 }

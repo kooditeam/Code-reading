@@ -13,33 +13,15 @@ import org.springframework.data.jpa.domain.AbstractPersistable;
  */
 @Entity
 public class QuestionSeries extends AbstractPersistable<Long> {
-    
-    @OneToMany(cascade = CascadeType.ALL)
-    private List<Question> questions;
-    
-    private String title;
 
-    public List<Question> getQuestions() { 
-        return questions;
-    }
+    private String title;
 
     public String getTitle() {
         return title;
     }
 
-    public void setQuestions(List<Question> questions) {
-        this.questions = questions;
-    }
-
     public void setTitle(String title) {
         this.title = title;
-    }
-    
-    public void addQuestion(Question question) {
-        if (questions == null) {
-            questions = new ArrayList<>();
-        }
-        questions.add(question);
     }
     
 }

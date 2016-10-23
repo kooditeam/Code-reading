@@ -25,21 +25,10 @@ public class User extends AbstractPersistable<Long> {
     @OneToMany(cascade = CascadeType.ALL)
     private List<Answer> answers;
 
-    @OneToMany(cascade = CascadeType.ALL)
-    private List<Question> createdQuestions;
-
     public User() {}
 
     public User(String studentNumber) {
         this.studentNumber = studentNumber;
-    }
-
-    public List<Question> getCreatedQuestions() {
-        return createdQuestions;
-    }
-
-    public void setCreatedQuestions(List<Question> createdQuestions) {
-        this.createdQuestions = createdQuestions;
     }
 
     public List<Answer> getAnswers() {

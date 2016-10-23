@@ -9,7 +9,6 @@ import codereading.repository.AnswerRepository;
 import codereading.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class AnswerService {
@@ -31,7 +30,6 @@ public class AnswerService {
         option = answerOptionRepository.findOne(option.getId());
 
         User user = userRepository.findOne(answer.getAnswerer().getId());
-        user.addAnswer(answer);
         userRepository.save(user);
 
         return new Feedback(option.getIsCorrect(),

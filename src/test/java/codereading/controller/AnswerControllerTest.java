@@ -122,7 +122,6 @@ public class AnswerControllerTest {
         answer = answerRepository.findAll().get(0);
 
         assertTrue(answerRepository.count() == count + 1L);
-        assertTrue(user.getAnswers().size() == 1);
         assertTrue(answer.getAnswerer().getId() == user.getId());
     }
 
@@ -153,7 +152,6 @@ public class AnswerControllerTest {
         Question question = new Question();
         question.setCreator(user);
         return questionRepository.save(question);
-
     }
 
     private String json(Object o) throws IOException {

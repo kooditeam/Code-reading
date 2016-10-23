@@ -36,7 +36,7 @@ public class QuestionSeriesService {
                                                        List<AnswerOption> answerOptions) {
 
         if (seriesId == null || question == null || studentNumberNotValid(studentNumber)
-                || answerOptionsNotValid(answerOptions)) {
+                || !answerOptionsValid(answerOptions)) {
             return null;
         }
 
@@ -49,10 +49,6 @@ public class QuestionSeriesService {
         saveAnswerOptionsWithQuestionInfo(answerOptions, question);
 
         return new SeriesRequestWrapper(series, studentNumber, question, answerOptions);
-    }
-
-    private boolean answerOptionsNotValid(List<AnswerOption> options) {
-        return options == null || options.size() < 2;
     }
 
     private boolean answerOptionsValid(List<AnswerOption> options) {

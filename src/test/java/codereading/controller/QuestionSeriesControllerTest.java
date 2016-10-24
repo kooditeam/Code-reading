@@ -627,7 +627,9 @@ public class QuestionSeriesControllerTest {
     private List<AnswerOption> createAnswerOptionsForQuestion(int amountOfOptions) {
         List<AnswerOption> options = new ArrayList<>();
         for (int i = 1; i <= amountOfOptions; i++) {
-            options.add(new AnswerOption());
+            AnswerOption option = new AnswerOption();
+            option.setAnswerText("test answer test");
+            options.add(option);
         }
 
         return options;

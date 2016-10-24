@@ -19,7 +19,7 @@ public class AnswerOptionService {
     
     @Autowired
     private AnswerOptionRepository answerOptionRepository;
-    
+
     public String getAnswerOptionsWithoutInfoOnWhichIsCorrect() throws JsonProcessingException {
         List<AnswerOption> options = answerOptionRepository.findAll();
 
@@ -30,8 +30,21 @@ public class AnswerOptionService {
 
         String optionsAsJson = mapper.writeValueAsString(JsonView.with(options).
                 onClass(AnswerOption.class, match().exclude("isCorrect")));
-        
+
         return optionsAsJson;
+    }
+
+    boolean answerOptionsValid(List<AnswerOption> options) {
+        if (options == null || options.size() < 2) {
+            return false;
+        }
+        for (AnswerOption option : options) {
+            if (option.getAnswerText() == null || option.getAnswerText().isEmpty()) {
+                return false;
+            }
+        }
+
+        return true;
     }
     
 }

@@ -31,6 +31,9 @@ public class QuestionSeriesService {
     @Autowired
     private AnswerOptionRepository answerOptionRepository;
 
+    @Autowired
+    private AnswerOptionService answerOptionService;
+
     public SeriesRequestWrapper createQuestionToSeries(Long seriesId, Question question,
                                                        String studentNumber,
                                                        List<AnswerOption> answerOptions) {
@@ -52,7 +55,7 @@ public class QuestionSeriesService {
     }
 
     private boolean answerOptionsValid(List<AnswerOption> options) {
-        return options != null && options.size() >= 2;
+        return answerOptionService.answerOptionsValid(options);
     }
 
     public SeriesRequestWrapper createNewSeries(QuestionSeries series,

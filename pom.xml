@@ -78,12 +78,7 @@
             <artifactId>gson</artifactId>
             <scope>test</scope>
         </dependency>
-        
-        <dependency>
-            <groupId>com.monitorjbl</groupId>
-            <artifactId>json-view</artifactId>
-            <version>0.12</version>
-        </dependency>
+
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-dbcp2</artifactId>

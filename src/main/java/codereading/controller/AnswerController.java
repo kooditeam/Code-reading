@@ -2,8 +2,6 @@ package codereading.controller;
 
 import codereading.domain.Answer;
 import codereading.domain.Feedback;
-import codereading.repository.AnswerOptionRepository;
-import codereading.repository.AnswerRepository;
 import codereading.service.AnswerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -17,20 +15,12 @@ import org.springframework.web.bind.annotation.RestController;
 public class AnswerController {
 
     @Autowired
-    private AnswerOptionRepository answerOptionRepository;
-
-    @Autowired
-    private AnswerRepository answerRepository;
-
-    @Autowired
     private AnswerService answerService;
 
     @RequestMapping(value = "/answers/new", method = RequestMethod.POST)
     public ResponseEntity<Feedback> checkAnswer(@RequestBody Answer answer) {
 
-        if (answer == null || answer.getAnswerer() == null
-                || answer.getAnswerOption() == null) {
-
+        if (!answerService.answerValid(answer)) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 

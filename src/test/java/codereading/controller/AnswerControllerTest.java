@@ -73,11 +73,6 @@ public class AnswerControllerTest {
 
     private HttpMessageConverter mappingJackson2HttpMessageConverter;
 
-    @Before
-    public void setup() {
-        mapper = new Gson();
-    }
-
     @Autowired
     private void setConverters(HttpMessageConverter<?>[] converters) {
 
@@ -91,18 +86,19 @@ public class AnswerControllerTest {
     @Before
     public void setUp() {
         mockMvc = MockMvcBuilders.webAppContextSetup(webAppContext).build();
+        mapper = new Gson();
     }
 
     @Test
     public void postWithCorrectAnswerInfoSendsFeedback() throws Exception {
-        Long count = answerRepository.count();
+        User user = userRepository.save(new User("112233211"));
 
-        User user = saveUser(0);
         Question question = saveQuestion(user);
         AnswerOption answerOption = new AnswerOption();
         answerOption.setIsCorrect(false);
         answerOption.setQuestion(question);
         answerOption = answerOptionRepository.save(answerOption);
+
         Answer answer = new Answer();
         answer.setAnswerer(user);
         answer.setAnswerOption(answerOption);
@@ -121,21 +117,25 @@ public class AnswerControllerTest {
         user = userRepository.findOne(user.getId());
         answer = answerRepository.findAll().get(0);
 
-        assertTrue(answerRepository.count() == count + 1L);
+        assertTrue(answerRepository.count() == 1);
         assertTrue(answer.getAnswerer().getId() == user.getId());
     }
 
     @Test
     public void postingNewAnswerWithUserThatIsNotInDatabaseReturnsBadRequest() throws Exception {
         User user = new User("0555555");
+
         Question question = new Question();
-        question.setCreator(user);
+        question.setCreator(userRepository.save(new User("01112224")));
+        question = questionRepository.save(question);
 
         AnswerOption option = new AnswerOption();
         option.setQuestion(question);
+        option = answerOptionRepository.save(option);
 
         Answer answer = new Answer();
         answer.setAnswerer(user);
+        answer.setAnswerOption(option);
 
         String answerAsJson = json(answer);
         this.mockMvc.perform(post(API_URI + "/new")
@@ -144,8 +144,27 @@ public class AnswerControllerTest {
                 .andExpect(status().isBadRequest());
     }
 
-    private User saveUser(int i) {
-        return userRepository.save(new User("sljkfa" + i));
+    @Test
+    public void postingNewAnswerWithAnswerOptionThatIsNotInDatabaseReturnsBadRequest() throws Exception {
+        User user = new User("0555555");
+        user = userRepository.save(user);
+
+        Question question = new Question();
+        question.setCreator(user);
+        question = questionRepository.save(question);
+
+        AnswerOption option = new AnswerOption();
+        option.setQuestion(question);
+
+        Answer answer = new Answer();
+        answer.setAnswerer(user);
+        answer.setAnswerOption(option);
+
+        String answerAsJson = json(answer);
+        this.mockMvc.perform(post(API_URI + "/new")
+                .contentType(contentType)
+                .content(answerAsJson))
+                .andExpect(status().isBadRequest());
     }
 
     private Question saveQuestion(User user) {

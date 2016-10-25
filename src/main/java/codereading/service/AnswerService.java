@@ -22,8 +22,10 @@ public class AnswerService {
     @Autowired
     private AnswerOptionRepository answerOptionRepository;
 
-    public Feedback saveAnswer(Answer answer) {
+    @Autowired
+    private AnswerOptionService answerOptionService;
 
+    public Feedback saveAnswer(Answer answer) {
         answerRepository.save(answer);
 
         AnswerOption option = answer.getAnswerOption();
@@ -34,5 +36,20 @@ public class AnswerService {
 
         return new Feedback(option.getIsCorrect(),
                 option.getExplanation());
+    }
+
+    public boolean answerValid(Answer answer) {
+        if (answer == null || answer.getAnswerer() == null || answer.getAnswerer().getId() == null
+                || answer.getAnswerOption() == null || answer.getAnswerOption().getId() == null) {
+            return false;
+        }
+        if (answerOptionService.answerOptionVExists(answer.getAnswerOption())) {
+            return false;
+        }
+        if (userRepository.getOne(answer.getAnswerer().getId()) == null) {
+            return false;
+        }
+
+        return true;
     }
 }

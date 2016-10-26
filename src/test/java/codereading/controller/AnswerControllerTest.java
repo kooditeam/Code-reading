@@ -103,11 +103,11 @@ public class AnswerControllerTest {
         answer.setAnswerer(user);
         answer.setAnswerOption(answerOption);
 
-        String answerAsJson = json(answer);
+        String answerAsJson = mapper.toJson(answer);
 
         MvcResult result = mockMvc.perform(post(API_URI + "/new")
                 .contentType(contentType)
-                .content(answerAsJson)).andReturn();
+                .content(answerAsJson)).andExpect(status().isOk()).andReturn();
 
         String feedbackAsJson = result.getResponse().getContentAsString();
         Feedback feedback = mapper.fromJson(feedbackAsJson, Feedback.class);
@@ -119,29 +119,6 @@ public class AnswerControllerTest {
 
         assertTrue(answerRepository.count() == 1);
         assertTrue(answer.getAnswerer().getId() == user.getId());
-    }
-
-    @Test
-    public void postingNewAnswerWithUserThatIsNotInDatabaseReturnsBadRequest() throws Exception {
-        User user = new User("0555555");
-
-        Question question = new Question();
-        question.setCreator(userRepository.save(new User("01112224")));
-        question = questionRepository.save(question);
-
-        AnswerOption option = new AnswerOption();
-        option.setQuestion(question);
-        option = answerOptionRepository.save(option);
-
-        Answer answer = new Answer();
-        answer.setAnswerer(user);
-        answer.setAnswerOption(option);
-
-        String answerAsJson = json(answer);
-        this.mockMvc.perform(post(API_URI + "/new")
-                .contentType(contentType)
-                .content(answerAsJson))
-                .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -160,7 +137,7 @@ public class AnswerControllerTest {
         answer.setAnswerer(user);
         answer.setAnswerOption(option);
 
-        String answerAsJson = json(answer);
+        String answerAsJson = mapper.toJson(answer);
         this.mockMvc.perform(post(API_URI + "/new")
                 .contentType(contentType)
                 .content(answerAsJson))
@@ -171,14 +148,5 @@ public class AnswerControllerTest {
         Question question = new Question();
         question.setCreator(user);
         return questionRepository.save(question);
-    }
-
-    private String json(Object o) throws IOException {
-        MockHttpOutputMessage mockHttpOutputMessage = new MockHttpOutputMessage();
-
-        this.mappingJackson2HttpMessageConverter.write(
-                o, MediaType.APPLICATION_JSON, mockHttpOutputMessage);
-
-        return mockHttpOutputMessage.getBodyAsString();
     }
 }

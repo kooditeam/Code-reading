@@ -10,7 +10,10 @@ public class Feedback {
 
     public Feedback() {}
 
-    public Feedback(boolean isCorrect, String explanation) {
+    public Feedback(Boolean isCorrect, String explanation) {
+        if (isCorrect == null) {
+            isCorrect = false;
+        }
         this.isCorrect = isCorrect;
         this.explanation = explanation;
     }

@@ -29,4 +29,7 @@ public interface QuestionRepository extends JpaRepository<Question, Long> {
     List<Question> questionsNotAnsweredCorrectlyInSeries(@Param("userId") Long userId,
                                                          @Param("seriesId") Long seriesId);
 
+    @Query("SELECT q FROM Question q WHERE q.questionSeries.id = :seriesId")
+    List<Question> questionsInSeries(@Param("seriesId") Long seriesId);
+
 }
